@@ -9,3 +9,8 @@
     color: white;
     padding: 0.5rem 0.88rem;
 }
+#loader {
+    display: block;
+    margin: 0 auto;
+    text-align: center;
+}
