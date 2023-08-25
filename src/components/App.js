@@ -1,56 +1,32 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react'
 import '../styles/App.css';
 import { Loader } from './Loader';
 import { PhotoFrame } from './PhotoFrame';
-import getData from './getData';
-
-
 const App = () => {
-  const [inputNumber, setInputNumber] = useState('');
-  const [photoData, setPhotoData] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleInputChange = (event) => {
-    setInputNumber(event.target.value);
-  };
-
-  const fetchData = async () => {
-    if (!inputNumber) return;
-
-    try {
+  const [input,setInput]= useState('');
+  const [isLoading,setIsLoading]= useState(false);
+  const [data,setData]= useState({});
+  async function getData(){
+    const resp= await fetch(`https://jsonplaceholder.typicode.com/photos/${input}`);
+    const data= await resp.json()
+    setData(data);
+    setIsLoading(false);
+  }
+  useEffect(()=>{
+    if(input!='') {
       setIsLoading(true);
-      const response = await fetch(`https://jsonplaceholder.typicode.com/photos/${inputNumber}`);
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      const data = await response.json();
-      setIsLoading(false);
-      setPhotoData(data);
-    } catch (error) {
-      setIsLoading(false);
-      console.error('Error fetching data:', error);
+      getData();
     }
-  };
-
-  const handleSearch = () => {
-    fetchData();
-  };
-
+  },[input])
   return (
-    <div>
-      <input
-        type="number"
-        value={inputNumber}
-        onChange={handleInputChange}
-        placeholder="Enter a number between 1 and 5000"
-      />
-      <button onClick={handleSearch}>Search</button>
-
-      {isLoading && <Loader />}
-
-      {photoData && <PhotoFrame url={photoData.url} title={photoData.title} />}
+    <div className='main'>
+      <label>Id number</label>
+      <input type='number' value={input} onChange={(e)=>setInput(e.target.value)}/>
+      {isLoading && <Loader/>}
+      {input && !isLoading && <PhotoFrame data={data} />}
     </div>
-  );
-};
+  )
+}
+
 
 export default App;
